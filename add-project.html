@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إضافة مشروع جديد</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase.js" defer></script>
+  <script src="add-project.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>➕ إضافة مشروع جديد</h1>
+    <a href="projects.html"><button>العودة للمشاريع</button></a>
+  </header>
+
+  <main>
+    <form id="project-form">
+      <label for="title">عنوان المشروع:</label>
+      <input type="text" id="title" name="title" required />
+
+      <label for="description">وصف المشروع:</label>
+      <textarea id="description" name="description" rows="4" required></textarea>
+
+      <button type="submit">💾 حفظ المشروع</button>
+    </form>
+
+    <p id="message"></p>
+  </main>
+</body>
+</html>
