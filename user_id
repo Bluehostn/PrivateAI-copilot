@@ -1,0 +1,6 @@
+const user = await supabase.auth.getUser();
+const userId = user.data.user.id;
+
+const { data, error } = await supabase
+  .from("projects")
+  .insert([{ title, description, user_id: userId }]);

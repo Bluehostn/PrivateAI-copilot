@@ -1,0 +1,9 @@
+easysite-clone/
+│
+├── index.html              ← واجهة البداية (إنشاء موقع)
+├── login.html              ← تسجيل الدخول
+├── dashboard.html          ← لوحة التحكم
+├── projects.html           ← عرض المشاريع المحفوظة
+├── supabase.js             ← إعداد الاتصال بـ Supabase
+├── styles.css              ← التنسيقات العامة
+├── README.md               ← وصف المشروع

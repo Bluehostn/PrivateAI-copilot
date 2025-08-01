@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>منشئ المواقع الذكي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="styles.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">🚀 أنشئ موقعك الذكي الآن</h2>
+
+    <div class="mb-3">
+      <label class="form-label">اسم الموقع:</label>
+      <input type="text" id="site-name" class="form-control" placeholder="مثلاً: متجر إلكتروني" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">وصف الموقع:</label>
+      <textarea id="site-description" class="form-control" placeholder="اكتب وصفًا للموقع الذي تريد إنشاءه..." rows="4"></textarea>
+    </div>
+
+    <button class="btn btn-success mb-3" onclick="generateSite()">إنشاء الموقع</button>
+
+    <div class="mb-3">
+      <label class="form-label">الكود الناتج:</label>
+      <textarea id="generated-code" class="form-control" readonly rows="10"></textarea>
+    </div>
+
+    <button class="btn btn-primary" onclick="previewSite()">معاينة الموقع</button>
+    <button class="btn btn-outline-secondary" onclick="copyCode()">نسخ الكود</button>
+    <button class="btn btn-warning" onclick="saveToSupabase()">حفظ في Supabase</button>
+
+    <iframe id="site-preview" class="mt-4" style="width: 100%; height: 300px; border: 1px solid #ccc;"></iframe>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabase.js"></script>
+  <script>
+    const apiKey = "YOUR_OPENAI_API_KEY"; // ضع مفتاحك هنا
+
+    async function generateSite() {
+      const name = document.getElementById("site-name").value;
+      const desc = document.getElementById("site-description").value;
+      if (!name || !desc) return alert("يرجى إدخال اسم ووصف الموقع");
+
+      const prompt = `أنشئ لي كود HTML وCSS لموقع بعنوان "${name}"، وصفه: "${desc}". التصميم يجب أن يكون أنيقًا وباللغة العربية.`;
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      const code = data.choices[0].message.content;
+      document.getElementById("generated-code").value = code;
+    }
+
+    function previewSite() {
+      const code = document.getElementById("generated-code").value;
+      const iframe = document.getElementById("site-preview");
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(code);
+      doc.close();
+    }
+
+    function copyCode() {
+      const code = document.getElementById("generated-code");
+      code.select();
+      document.execCommand("copy");
+      alert("✅ تم نسخ الكود!");
+    }
+
+    async function saveToSupabase() {
+      const name = document.getElementById("site-name").value;
+      const description = document.getElementById("site-description").value;
+      const html = document.getElementById("generated-code").value;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return alert("❌ يجب تسجيل الدخول أولاً");
+
+      const response = await fetch("https://rlujwboirgabxqyvecvm.supabase.co/rest/v1/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${supabaseKey}`,
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          html,
+          user_id: user.id,
+          created_at: new Date().toISOString()
+        })
+      });
+
+      if (response.ok) {
+        alert("✅ تم حفظ المشروع في Supabase!");
+      } else {
+        alert("❌ فشل الحفظ. تحقق من الإعدادات.");
+      }
+    }
+  </script>
+</body>
+</html>
